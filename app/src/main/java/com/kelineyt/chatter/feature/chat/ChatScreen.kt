@@ -1,13 +1,17 @@
 package com.kelineyt.chatter.feature.chat
 
+import com.kelineyt.chatter.R
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,7 +20,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -24,8 +27,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,10 +38,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.kelineyt.chatter.feature.home.HomeViewModel
@@ -52,19 +59,44 @@ fun ChatScreen(navController: NavController, channelID: String) {
         .firstOrNull { it.id == channelID } // Find the channel with the matching ID
         ?.name // Extract the title
         ?: "Unknown Channel" // Fallback title if the channel is not found
+    val systemUiController = rememberSystemUiController()
+
+    // Set status bar color
+    SideEffect {
+        systemUiController.setStatusBarColor(
+            color = Color.Black, // Match scaffold
+            darkIcons = false // Ensure icons are visible (white)
+        )
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(channelTitle) },
+                title = {
+                    Text(
+                        text = channelTitle,
+                        color = Color.White // Ensure title text is visible
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = {
                         navController.popBackStack()
                     }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back",
+                            tint = Color.White // Ensure back icon is visible
+                        )
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.Black, // Match Scaffold's background
+                    titleContentColor = Color.White, // Ensure title is readable
+                    navigationIconContentColor = Color.White // Ensure back icon is visible
+                )
             )
-        }
+        },
+        containerColor = Color.Black
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -146,6 +178,14 @@ fun ChatBubble(message: Message) {
             .padding(vertical = 4.dp, horizontal = 8.dp),
         horizontalArrangement = alignment
     ) {
+        if (!isCurrentUser) {
+            Image(
+                painter = painterResource(id = R.drawable.friend),
+                contentDescription = "Avatar",
+                modifier = Modifier.size(40.dp)
+            )
+            Spacer(modifier = Modifier.size(8.dp))
+        }
         Box(
             modifier = Modifier
                 .background(color = bubbleColor, shape = RoundedCornerShape(8.dp))

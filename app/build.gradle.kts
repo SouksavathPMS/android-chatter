@@ -62,6 +62,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.dagger.hilt.android)
     implementation(libs.firebase.crashlytics.buildtools)
+    implementation (libs.accompanist.systemuicontroller)
     kapt(libs.dagger.hilt.compiler)
     implementation(libs.dagger.hilt.compose)
     implementation(libs.coil)

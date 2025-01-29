@@ -1,9 +1,9 @@
 package com.kelineyt.chatter.feature.home
 
-import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import com.google.firebase.Firebase
+import com.google.firebase.crashlytics.buildtools.reloc.org.apache.commons.logging.Log
 import com.google.firebase.database.database
 import com.kelineyt.chatter.feature.model.Channel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,7 +20,6 @@ class HomeViewModel @Inject constructor() : ViewModel() {
     val channels = _channels.asStateFlow()
 
     init {
-        Firebase.database.setPersistenceEnabled(true) // Enable offline persistence
         getChannel()
     }
 
@@ -37,5 +36,12 @@ class HomeViewModel @Inject constructor() : ViewModel() {
         }
     }
 
+    fun addChannel(channelName: String) {
+        val key = firebaseDatabase.getReference("channel").push().key
+        firebaseDatabase.getReference("channel").child(key!!).setValue(channelName)
+            .addOnCompleteListener {
+                getChannel()
+            }
 
+    }
 }
